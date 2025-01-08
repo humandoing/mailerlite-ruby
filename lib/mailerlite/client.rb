@@ -33,7 +33,7 @@ module MailerLite
       end
 
       # Check for Rails credentials if Rails is defined
-      if defined?(Rails) && Rails.application.credentials&.mailer_lite&[:api_token]
+      if defined?(Rails) && Rails.application.credentials&.mailer_lite[:api_token]
         @api_token = Rails.application.credentials.mailer_lite[:api_token]
       else
         # Fall back to ENV variable
