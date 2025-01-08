@@ -99,7 +99,15 @@ You will have to initalize it in your Ruby file with `require "mailerlite-ruby"`
 
 # Usage
 
-This SDK requires that you either have `.env` file with `MAILERLITE_API_TOKEN` env variable or that your variable is enabled system wide (useful for Docker/Kubernetes). The example of how `MAILERLITE_API_TOKEN` should look like is in `.env.example`.
+This SDK requires that you have the `MAILERLITE_API_TOKEN` environment variable set. You can set this variable in a `.env` file or enable it system-wide (useful for Docker/Kubernetes). The example of how `MAILERLITE_API_TOKEN` should look like is in `.env.example`.
+
+If you want to use `dotenv` to manage your environment variables, you can configure the `mailerlite` gem to load `dotenv`:
+
+```ruby
+MailerLite.configure do |config|
+  config.use_dotenv = true
+end
+```
 
 ## Subscribers
 
@@ -115,7 +123,7 @@ require "mailerlite-ruby"
 # Intialize the class
 subscribers = MailerLite::Subscribers.new
 
-subscribers.fetch(filter: { status: 'active' })
+subscribers.fetch(filter: { status: 'active' }, cursor: 'cursor')
 ```
 
 ### Create a subscriber
@@ -141,7 +149,7 @@ require "mailerlite-ruby"
 # Intialize the class
 subscribers = MailerLite::Subscribers.new
 
-subscribers.update(email:'some@email.com', fields: {'name': 'John', 'last_name': 'Doe'}, ip_address:'1.2.3.4', optin_ip:'1.2.3.4')
+subscribers.update('some@email.com', fields: {'name': 'John', 'last_name': 'Doe'}, ip_address:'1.2.3.4', optin_ip:'1.2.3.4')
 ```
 
 ### Get a subscriber
@@ -186,7 +194,7 @@ require "mailerlite-ruby"
 # Intialize the class
 groups = MailerLite::Groups.new
 
-groups.list(limit:10, page:1, filter:{'name': 'My'}, sort:'name')
+groups.get(limit:10, page:1, filter:{'name': 'My'}, sort:'name')
 ```
 
 ### Create a group
@@ -237,10 +245,10 @@ groups.delete(group_id)
 ```ruby
 require "mailerlite-ruby"
 
-# Intialize the class
+# Initialize the class
 groups = MailerLite::Groups.new
 
-groups.get_subscribers(group_id:1234567, page:1, limit:10, filter:{'status': 'active'})
+groups.get_subscribers(group_id: 1234567, cursor: 'cursor', limit: 10, filter: { 'status': 'active' })
 ```
 
 ### Assign subscriber to a group
@@ -493,7 +501,7 @@ require "mailerlite-ruby"
 campaigns = MailerLite::Campaigns.new
 
 campaigns.update(
-  campaign_id: 1233455, 
+  campaign_id: 1233455,
   name: "New Campaign Name",
   language_id: 2,
   emails: [{
@@ -713,7 +721,7 @@ webhooks.create(
     'subscriber.created',
     'subscriber.updated',
     'subscriber.unsubscribed'
-  ], 
+  ],
   url:'https://my-url.com',
   name: 'Webhook name'
 )
@@ -730,12 +738,12 @@ require "mailerlite-ruby"
 webhooks = MailerLite::Webhooks.new
 
 webhooks.update(
-  webhook_id: 123456, 
+  webhook_id: 123456,
   events:[
     'subscriber.created',
     'subscriber.updated',
     'subscriber.unsubscribed'
-  ], 
+  ],
   url:'https://my-url.com',
   name: 'Webhook name',
   enabled: false
@@ -794,7 +802,7 @@ campaigns.languages()
 # Testing
 
 ```bash
-bundle i 
+bundle i
 bundle exec rspec spec/*rspec.rb
 ```
 
@@ -804,7 +812,7 @@ The fixtures for the test have been recorded using vcr and are available in the 
 # Generate Docs
 
 ```bash
-bundle i 
+bundle i
 bundle exec yardoc 'lib/**/*.rb'
 ```
 

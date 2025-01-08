@@ -15,21 +15,29 @@ module MailerLite
     end
   end
 
-  class Client
-    attr_reader :api_token
+  class << self
+    attr_accessor :use_dotenv
 
-    def initialize(api_token = nil)
-      # Use passed token or fallback to global config, Rails credentials, or ENV
-      @api_token = api_token || MailerLite.api_token || fetch_api_token
+    def configure
+      yield self
     end
+  end
 
-    def fetch_api_token
+  # Inits the client.
+  class Client
+    def initialize
+      if MailerLite.use_dotenv
+        require 'dotenv'
+        Dotenv.load
+        Dotenv.require_keys('MAILERLITE_API_TOKEN')
+      end
+
       # Check for Rails credentials if Rails is defined
       if defined?(Rails) && Rails.application.credentials&.mailer_lite&[:api_token]
-        Rails.application.credentials.mailer_lite[:api_token]
+        @api_token = Rails.application.credentials.mailer_lite[:api_token]
       else
         # Fall back to ENV variable
-        ENV['MAILERLITE_API_TOKEN']
+        @api_token = ENV.fetch('MAILERLITE_API_TOKEN', nil)
       end
     end
 
